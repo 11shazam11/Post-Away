@@ -1,0 +1,477 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "POSTAway Api",
+        "description": "Api for handling posts, comments, likes"
+    },
+    "host": "localhost:3000",
+    "securityDefinitions": {
+        "JWT": {
+            "in": "header",
+            "name": "Authorization",
+            "type": "apiKey"
+        }
+    },
+    "paths": {
+        "/api/users/signup": {
+            "post": {
+                "tags": ["USERS"],
+                "summary": "Register user",
+                "description": "Api for registering a new user",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "User Credentials",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "example": "Abhay"
+                                },
+                                "email": {
+                                    "type": "string",
+                                    "example": "abhay@gmail.com"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "example": "pass1"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the added User"
+                    }
+                }
+            }
+        },
+        "/api/users/signin": {
+            "post": {
+                "tags": ["USERS"],
+                "summary": "Sign-In user",
+                "description": "API for login user",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "User Credentials",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "email": {
+                                    "type": "string",
+                                    "example": "abhay@gmail.com"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "example": "pass1"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "On success returns JWT token"
+                    },
+                    "404": {
+                        "description": "Invalid Credentials"
+                    }
+                }
+            }
+        },
+        "/api/post/all": {
+            "get": {
+                "tags": ["POSTS"],
+                "summary": "Users Posts",
+                "description": "Retrieves all posts by all users",
+                "security": [
+                    { "JWT": {} }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns all Posts"
+                    },
+                    "400": {
+                        "description": "No authorization token found"
+                    }
+                }
+            }
+        },
+        "/api/post/{id}": {  
+            "get": {
+                "tags": ["POSTS"],
+                "summary": "Get post by ID",
+                "description": "Retrieves a post by its ID",
+                "security": [
+                    { "JWT": {} }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",                
+                        "in": "path",                
+                        "required": true,            
+                        "type": "string",            
+                        "description": "ID of the post to retrieve"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns the post details"
+                    },
+                    "404": {
+                        "description": "Post not found"
+                    }
+                }
+            },
+            "delete":{
+                "tags":["POSTS"],
+                "summary":"Delete post",
+                "description":"Deletes the post provided the post id",
+                "security":[
+                    {"JWT":{}}
+                ],
+                "parameters":[
+                    {
+                        "in":"path",
+                        "name":"id",
+                        "type":"string",
+                        "description":"Id of post to delete",
+                        "required":true
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Returns deleted post"
+                    },
+                    "404":{
+                        "description":"Post not found"
+                    },
+                    "401":{
+                        "description":"not ypur post to delete"
+                    }
+                }
+            },
+            "put":{
+                "tags":["POSTS"],
+                "summary":"Updates post",
+                "description":"Updates the post provided id",
+                "security":[
+                    {"JWT":{}}
+                ],
+                "consumes":[
+                    "multipart/form-data"
+                ],
+                "parameters":[
+                    {
+                        "in":"path",
+                        "name":"id",
+                        "type":"string",
+                        "required":true,
+                        "description":"Id of post to update"
+                    },
+                    {
+                        "in":"formData",
+                        "name":"desc",
+                        "type":"string",
+                        "description":"Pots Description"
+                    },
+                    {
+                        "in":"formData",
+                        "name":"imageUrl",
+                        "type":"file",
+                        "description":"Image for the post"
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Returns Updated post"
+                    },
+                    "401":{
+                        "description":"Not your post to Update"
+                    },
+                    "404":{
+                        "description":"Post does not exists"
+                    }
+                }
+            }
+        },
+        "/api/post/caption/{caption}":{
+            "get":{
+                "tags":["POSTS"],
+                "summary":"Filter by caption",
+                "description":"Get only post with included caption",
+                "security":[
+                    {"JWT":{}}
+                ],
+                "parameters":[
+                    {
+                        "in":"path",
+                        "name":"caption",
+                        "description":"Caption you eant to filter post with",
+                        "required":true,
+                        "type":"string"
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Returns post which includes provided captions"
+                    },
+                    "404":{
+                        "description":"No post with caption "
+                    }
+                }
+            }
+        },
+        "/api/post/":{
+            "get":{
+                "tags":["POSTS"],
+                "summary":"Get users post",
+                "description":"Gets all the post of logged in user",
+                "security":[
+                    {"JWT":{}}
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Returns all Users posts"
+                    },
+                    "400":{
+                        "description":"No post"
+                    }
+                }
+            },
+            "post":{
+                "tags":["POSTS"],
+                "description":"Yser can create a new Post",
+                "summary":"Add post",
+                "security":[
+                    {"JWT":{}}
+                ],
+                "consumes":[
+                    "multipart/form-data"
+                ],
+                "parameters":[
+                    {
+                        "in":"formData",
+                        "name":"desc",
+                        "type":"string",
+                        "description":"Pots Description",
+                        "required":true
+                    },
+                    {
+                        "in":"formData",
+                        "name":"imageUrl",
+                        "type":"file",
+                        "description":"Image for the post",
+                        "required":true
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Return Added post"
+                    },
+                    "400":{
+                        "description":"No authorization token found"
+                    }
+                }
+            }
+        },
+        "/api/comments/{id}":{
+            "get":{
+                "tags":["COMMENTS"],
+                "summary":"Get post comments",
+                "description":"For a given post Id return its comments",
+                "security":[
+                    {"JWT":{}}
+                ],
+                "parameters":[
+                    {
+                        "in":"path",
+                        "name":"id",
+                        "type":"string",
+                        "required":true,
+                        "description":"Id of post you want see comments"
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Returns comments if any otherwise returns No comments yet"
+                    },
+                    "404":{
+                        "description":"post does not exists"
+                    }
+                }
+            },
+            "post":{
+                "tags":["COMMENTS"],
+                "summary":"Add comment",
+                "description":"Add's a comment to post with the provided ID",
+                "security":[
+                    {"JWT":{}}
+                ],
+                "parameters":[
+                    {
+                        "in":"path",
+                        "name":"id",
+                        "type":"string",
+                        "required":true,
+                        "description":"Id of post you want to add comment to"
+                    },
+                    {
+                        "in":"body",
+                        "name":"body",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "comment":{
+                                    "type":"string",
+                                    "example":"Good comment"
+                                }
+                            }
+                        },
+                        "required":true,
+                        "description":"Comment you want to add"
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Returns an object with true msg and added msg"
+                    },
+                    "404":{
+                        "description":"Post does not exists"
+                    }
+                }
+            },
+            "delete":{
+                "tags":["COMMENTS"],
+                "summary":"Delete's comment",
+                "description":"Deletes the comment provided the comment id",
+                "security":[
+                    {"JWT":{}}
+                ],
+                "parameters":[
+                    {
+                        "in":"path",
+                        "name":"id",
+                        "type":"string",
+                        "required":true,
+                        "description":"Id of comment you want to delete"
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"returns the deleted comment in json format"
+                    },
+                    "404":{
+                        "description":"No comment exits"
+                    },
+                    "401":{
+                        "description":"Cannot delete other's comments"
+                    }
+                }
+            },
+            "put":{
+                "tags":["COMMENTS"],
+                "summary":"Update Comment",
+                "description":"Update the comment with provided Id",
+                "security":[
+                    {"JWT":{}}
+                ],
+                "parameters":[
+                    {
+                        "in":"path",
+                        "name":"id",
+                        "type":"string",
+                        "description":"Id of the comment you want to update",
+                        "required":true
+                    },
+                    {
+                        "in":"body",
+                        "name":"body",
+                        "schema":{
+                            "type":"object",
+                            "properties":{
+                                "comment":{
+                                    "type":"string",
+                                    "example":"Good comment"
+                                }
+                            }
+                        },
+                        "description":"Comment you want to add",
+                        "required":true
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Returns the updated comment"
+                    },
+                    "404":{
+                        "description":"No comment exits"
+                    },
+                    "401":{
+                        "description":"Cannot update other's comments"
+                    }
+                }
+            }
+        },
+        "/api/likes/{postId}":{
+            "get":{
+                "tags":["LIKES"],
+                "summary":"Get Likes",
+                "description":"Get the like of post provided post Id",
+                "security":[
+                    {"JWT":{}}
+                ],
+                "parameters":[
+                    {
+                        "in":"path",
+                        "name":"postId",
+                        "type":"string",
+                        "required":true,
+                        "description":"Post id you want likes of"
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Returns total likes on post if any otherwise returns No likes yet"
+                    },
+                    "404":{
+                        "description":"Post does not exists"
+                    }
+                }
+            }
+        },
+        "/api/likes/toggle/{postId}":{
+            "get":{
+                "tags":["LIKES"],
+                "summary":"Add or remove like",
+                "description":"Add's a like if not ,removes the like if already liked",
+                "security":[
+                    {"JWT":{}}
+                ],
+                "parameters":[
+                    {
+                        "in":"path",
+                        "name":"postId",
+                        "type":"string",
+                        "description":"Post id you want add or remove like",
+                        "required":true
+                    }
+                ],
+                "responses":{
+                    "200":{
+                        "description":"Returns Post liked,removed from likes based on conditions"
+                    },
+                    "404":{
+                        "description":"Post does not exists"
+                    }
+                }
+            }
+        }
+    }
+}
